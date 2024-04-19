@@ -45,7 +45,7 @@ export const Register = () => {
     const response = await userController.signUp(data);
     console.log(response);
     console.log(response.status);
-    response.status == 201
+    response.status === 201
         ? alert("Usuario registrado")
         : alert("Error al registrar usuario");
     };

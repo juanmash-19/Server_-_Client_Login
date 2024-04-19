@@ -19,5 +19,7 @@ router.get("/", userController.getListUsers);
 router.get("/:id", userController.getUserById);
 router.patch("/:id", userController.editUser);
 router.delete("/delete-user/:id", userController.deleteUser);
+router.post("/login", userController.loginUser);
+
 
 module.exports = router;

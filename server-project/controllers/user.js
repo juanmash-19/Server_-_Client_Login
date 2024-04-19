@@ -1,25 +1,57 @@
 const UserModel = require("../models/user");
+const bcrypt = require("bcrypt");
 
 const createUser = async (req, res) => {
     try {
-        const { user_name, last_name, email, password, active_status, role } = req.body;
+        const { user_name, lastname, email, password, active_status, role } = req.body;
         const avatar = req.file ? req.file.filename : null;
-        console.log(avatar);
+        
+        // Hashea la contraseña antes de guardar el usuario
+        console.log(" sssss  ");
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = new UserModel({
             user_name,
-            last_name,
+            last_name:lastname,
             email,
-            password,
+            password: hashedPassword, // Guarda la contraseña hasheada
             active_status,
             role,
             avatar
         });
-        const newUser= await user.save();
+        console.log(user);
+    
+        const newUser = await user.save();
+        console.log(newUser);
         res.status(201).json(newUser);
+      } catch (error) {
+        console.log(error);
+        res.status(400).json({ message: error.message });
+      }
+};
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: "Usuario no encontrado" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: "Contraseña incorrecta" });
+        }
+
+        req.session.user = user;
+        res.status(200).json(user);
     } catch (error) {
-    res.status(400).json({ message: error.message });
+        console.log(error);
+        res.status(500).json({ message: error.message });
     }
 };
+
 
 const getListUsers = async (req, res) => {
     try{
@@ -70,4 +102,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getListUsers, getUserById, editUser, deleteUser};
+module.exports = { createUser, getListUsers, getUserById, editUser, deleteUser, loginUser };    
