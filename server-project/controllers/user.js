@@ -6,14 +6,12 @@ const createUser = async (req, res) => {
         const { user_name, lastname, email, password, active_status, role } = req.body;
         const avatar = req.file ? req.file.filename : null;
         
-        // Hashea la contraseña antes de guardar el usuario
-        console.log(" sssss  ");
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new UserModel({
             user_name,
             last_name:lastname,
             email,
-            password: hashedPassword, // Guarda la contraseña hasheada
+            password: hashedPassword, // Guarda la contraseña
             active_status,
             role,
             avatar
@@ -23,10 +21,10 @@ const createUser = async (req, res) => {
         const newUser = await user.save();
         console.log(newUser);
         res.status(201).json(newUser);
-      } catch (error) {
+        } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });
-      }
+        }
 };
 const loginUser = async (req, res) => {
     try {
@@ -78,8 +76,7 @@ const editUser = async (req, res) => {
     try{
         const { id } = req.params;
         const { user_name, last_name, email, password } = req.body;
-        // findByIdAndUpdate recibe 3 parametros: el id del usuario o editar,
-        // los datos a editar y un objetivo con la propiedad new: true
+
         const user = await UserModel.findByIdAndUpdate(
             id,
             {user_name, last_name, email, password},
